@@ -331,9 +331,9 @@ struct sqlite3_api_routines {
   const char *(*filename_journal)(const char*);
   const char *(*filename_wal)(const char*);
   /* Version 3.32.0 and later */
-  char *(*create_filename)(const char*,const char*,const char*,
+  const char *(*create_filename)(const char*,const char*,const char*,
                            int,const char**);
-  void (*free_filename)(char*);
+  void (*free_filename)(const char*);
   sqlite3_file *(*database_file_object)(const char*);
   /* Version 3.34.0 and later */
   int (*txn_state)(sqlite3*,const char*);
@@ -357,6 +357,13 @@ struct sqlite3_api_routines {
   unsigned char *(*serialize)(sqlite3*,const char *,sqlite3_int64*,
                               unsigned int);
   const char *(*db_name)(sqlite3*,int);
+  /* Version 3.40.0 and later */
+  int (*value_encoding)(sqlite3_value*);
+
+  /* libSQL 0.1.1 */
+  struct libsql_wal_methods *(*wal_methods_find)(const char *);
+  int (*wal_methods_register)(struct libsql_wal_methods*);
+  int (*wal_methods_unregister)(struct libsql_wal_methods*);
 };
 
 /*
@@ -681,6 +688,12 @@ typedef int (*sqlite3_loadext_entry)(
 #define sqlite3_serialize              sqlite3_api->serialize
 #endif
 #define sqlite3_db_name                sqlite3_api->db_name
+/* Version 3.40.0 and later */
+#define sqlite3_value_encoding         sqlite3_api->value_encoding
+/* libSQL 0.1.1 */
+#define libsql_wal_methods_find        sqlite3_api->wal_methods_find
+#define libsql_wal_methods_register    sqlite3_api->wal_methods_register
+#define libsql_wal_methods_unregister  sqlite3_api->wal_methods_unregister
 #endif /* !defined(SQLITE_CORE) && !defined(SQLITE_OMIT_LOAD_EXTENSION) */
 
 #if !defined(SQLITE_CORE) && !defined(SQLITE_OMIT_LOAD_EXTENSION)
